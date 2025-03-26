@@ -53,91 +53,248 @@
   }
 },
   {
-    "model": "air_quality.pollutant",
+    "model": "air_quality.compound",
     "pk": 1,
     "fields": {
       "symbol": "PM2.5",
-      "full_name": "Fine Particulate Matter"
+      "full_name": "Fine Particulate Matter",
+      "is_gaseous": false,
+      "molecular_weight": null
     }
   },
   {
-    "model": "air_quality.pollutant",
+    "model": "air_quality.compound",
     "pk": 2,
     "fields": {
       "symbol": "PM10",
-      "full_name": "Coarse Particulate Matter"
+      "full_name": "Coarse Particulate Matter",
+      "is_gaseous": false,
+      "molecular_weight": null
     }
   },
   {
-    "model": "air_quality.pollutant",
+    "model": "air_quality.compound",
     "pk": 3,
     "fields": {
       "symbol": "NO₂",
-      "full_name": "Nitrogen Dioxide"
+      "full_name": "Nitrogen Dioxide",
+      "is_gaseous": true,
+      "molecular_weight": 46
     }
   },
   {
-    "model": "air_quality.pollutant",
+    "model": "air_quality.compound",
     "pk": 4,
     "fields": {
       "symbol": "SO₂",
-      "full_name": "Sulfur Dioxide"
+      "full_name": "Sulfur Dioxide",
+      "is_gaseous": true,
+      "molecular_weight": 64
     }
   },
   {
-    "model": "air_quality.pollutant",
+    "model": "air_quality.compound",
     "pk": 5,
     "fields": {
       "symbol": "CO",
-      "full_name": "Carbon Monoxide"
+      "full_name": "Carbon Monoxide",
+      "is_gaseous": true,
+      "molecular_weight": 28
     }
   },
   {
-    "model": "air_quality.pollutant",
+    "model": "air_quality.compound",
     "pk": 6,
     "fields": {
       "symbol": "O₃",
-      "full_name": "Ozone"
+      "full_name": "Ozone",
+      "is_gaseous": true,
+      "molecular_weight": 48
     }
   },
   {
-    "model": "air_quality.pollutant",
+    "model": "air_quality.compound",
     "pk": 7,
     "fields": {
       "symbol": "VOC",
-      "full_name": "Volatile Organic Compounds"
+      "full_name": "Volatile Organic Compounds",
+      "is_gaseous": false,
+      "molecular_weight": null
     }
   },
   {
-    "model": "air_quality.pollutant",
+    "model": "air_quality.compound",
     "pk": 8,
     "fields": {
       "symbol": "NH₃",
-      "full_name": "Ammonia"
+      "full_name": "Ammonia",
+      "is_gaseous": true,
+      "molecular_weight": 17
     }
   },
   {
-    "model": "air_quality.pollutant",
+    "model": "air_quality.compound",
     "pk": 9,
     "fields": {
       "symbol": "BC",
-      "full_name": "Black Carbon"
+      "full_name": "Black Carbon",
+      "is_gaseous": false,
+      "molecular_weight": null
     }
   },
   {
-    "model": "air_quality.pollutant",
+    "model": "air_quality.compound",
     "pk": 10,
     "fields": {
       "symbol": "H₂S",
-      "full_name": "Hydrogen Sulfide"
+      "full_name": "Hydrogen Sulfide",
+      "is_gaseous": true,
+      "molecular_weight": 34
     }
   },
   {
-    "model": "air_quality.pollutant",
+    "model": "air_quality.compound",
     "pk": 11,
     "fields": {
       "symbol": "CH₄",
-      "full_name": "Methane"
+      "full_name": "Methane",
+      "is_gaseous": true,
+      "molecular_weight": 16
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 1,
+    "fields": {
+      "name": "Eiffel Tower",
+      "coordinates": "POINT(2.2945 48.8584)",
+      "tags": [1]
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 2,
+    "fields": {
+      "name": "Louvre Museum",
+      "coordinates": "POINT(2.3364 48.8606)",
+      "tags": [1]
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 3,
+    "fields": {
+      "name": "Notre-Dame Cathedral",
+      "coordinates": "POINT(2.3499 48.8529)",
+      "tags": [1]
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 4,
+    "fields": {
+      "name": "Montmartre",
+      "coordinates": "POINT(2.3431 48.8867)",
+      "tags": [1]
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 5,
+    "fields": {
+      "name": "La Défense",
+      "coordinates": "POINT(2.2376 48.8924)",
+      "tags": [1]
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 6,
+    "fields": {
+      "name": "Times Square",
+      "coordinates": "POINT(-73.9851 40.7580)",
+      "tags": [2]
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 7,
+    "fields": {
+      "name": "Central Park",
+      "coordinates": "POINT(-73.9683 40.7851)",
+      "tags": [2]
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 8,
+    "fields": {
+      "name": "Brooklyn Bridge",
+      "coordinates": "POINT(-73.9969 40.7061)",
+      "tags": [2]
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 9,
+    "fields": {
+      "name": "Empire State Building",
+      "coordinates": "POINT(-73.9857 40.7488)",
+      "tags": [2]
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 10,
+    "fields": {
+      "name": "Wall Street",
+      "coordinates": "POINT(-74.0088 40.7074)",
+      "tags": [2]
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 11,
+    "fields": {
+      "name": "Shinjuku Station",
+      "coordinates": "POINT(139.7004 35.6895)",
+      "tags": [3]
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 12,
+    "fields": {
+      "name": "Shibuya Crossing",
+      "coordinates": "POINT(139.7021 35.6595)",
+      "tags": [3]
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 13,
+    "fields": {
+      "name": "Tokyo Tower",
+      "coordinates": "POINT(139.7454 35.6586)",
+      "tags": [3]
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 14,
+    "fields": {
+      "name": "Akihabara",
+      "coordinates": "POINT(139.7711 35.6989)",
+      "tags": [3]
+    }
+  },
+  {
+    "model": "air_quality.location",
+    "pk": 15,
+    "fields": {
+      "name": "Ueno Park",
+      "coordinates": "POINT(139.7745 35.7148)",
+      "tags": [3]
     }
   }
-]
+  ]

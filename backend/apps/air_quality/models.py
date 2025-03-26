@@ -1,5 +1,5 @@
 from django.contrib.gis.db import models as gis_models
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 
 
@@ -25,26 +25,36 @@ class Location(gis_models.Model):
         return self.name
 
 
-class Pollutant(models.Model):
+class Compound(models.Model):
     symbol = models.CharField(max_length=50, unique=True)
     full_name = models.CharField(max_length=100)
+    molecular_weight = models.FloatField(null=True, blank=True)
+    is_gaseous = models.BooleanField(default=False)
 
     def __str__(self):
         return self.symbol
 
 
-class AirPollutantReading(models.Model):
+class AirCompoundReading(models.Model):
+    CONCENTRATION_UNITS = (
+        ("ug_m3", "Micrograms per cubic meter"),
+        ("mg_m3", "Milligrams per cubic meter"),
+        ("ppm", "Parts per million"),
+        ("ppb", "Parts per billion"),
+    )
     location = models.ForeignKey(
-        to=Location, on_delete=models.CASCADE, related_name="air_pollutant_readings"
+        to=Location, on_delete=models.CASCADE, related_name="air_readings"
     )
-    pollutant = models.ForeignKey(
-        to=Pollutant, on_delete=models.CASCADE, related_name="air_pollutant_readings"
+    compound = models.ForeignKey(
+        to=Compound, on_delete=models.CASCADE, related_name="air_readings"
     )
-    concentration = models.FloatField(
-        validators=[MinValueValidator(0), MaxValueValidator(300)],
-        help_text="Concentration of the pollutant",
+    entered_concentration_value = models.FloatField(
+        validators=[MinValueValidator(0)],
+        help_text="Entered concentration value of the target compound",
     )
-    concentration_unit = models.CharField(
-        help_text="Concentration unit of the pollutant",
+    entered_concentration_unit = models.CharField(
+        max_length=10,
+        choices=CONCENTRATION_UNITS,
+        help_text="Concentration of the entered concentration value",
     )
     timestamp = models.DateTimeField(auto_now_add=True)

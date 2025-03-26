@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     "django_filters",
     "drf_yasg",
     "silk",
-
     "apps.users",
     "apps.air_quality",
 ]
