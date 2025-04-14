@@ -92,7 +92,7 @@ class AirCompoundReadingFilterSet(FilterSet):
         return value
 
     @staticmethod
-    def validate_radius(value: float, max_km: float = 500000000) -> float:
+    def validate_radius(value: float, max_km: float = 100) -> float:
         try:
             value = float(value)
         except (TypeError, ValueError):

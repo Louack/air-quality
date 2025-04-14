@@ -1,3 +1,4 @@
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from apps.air_quality.views import (
@@ -5,6 +6,7 @@ from apps.air_quality.views import (
     CompoundViewSet,
     LocationViewSet,
     TagViewSet,
+    AirCompoundStatsWithinRadiusView,
 )
 
 router = DefaultRouter(trailing_slash=False)
@@ -16,4 +18,10 @@ router.register(
 )
 
 
-urlpatterns = [] + router.urls
+urlpatterns = [
+    path(
+        "readings/stats/radius",
+        AirCompoundStatsWithinRadiusView.as_view(),
+        name="stats-radius",
+    )
+] + router.urls
