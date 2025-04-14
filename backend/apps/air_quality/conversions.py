@@ -40,7 +40,7 @@ CONVERSION_RULES = {
 }
 
 
-def convert_concentration(queryset, target_unit):
+def get_qs_with_converted_concentration(queryset, target_unit):
     whens = []
     for (from_unit, to_unit), expression in CONVERSION_RULES.items():
         if target_unit != to_unit:

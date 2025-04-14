@@ -3,8 +3,8 @@ from django.contrib.gis.measure import D
 from django_filters.rest_framework import FilterSet, filters
 from rest_framework.exceptions import ValidationError
 
-from apps.air_quality.conversions import convert_concentration
-from apps.air_quality.models import AirCompoundReading, Compound, Tag, Location
+from apps.air_quality.conversions import get_qs_with_converted_concentration
+from apps.air_quality.models import AirCompoundReading, Compound, Location, Tag
 
 
 class LocationFilterSet(FilterSet):
@@ -38,7 +38,7 @@ class AirCompoundReadingFilterSet(FilterSet):
     radius = filters.NumberFilter(method="filter_by_radius")
 
     def convert_to_target_unit(self, queryset, name, value):
-        return convert_concentration(queryset=queryset, target_unit=value)
+        return get_qs_with_converted_concentration(queryset=queryset, target_unit=value)
 
     def filter_by_radius(self, queryset, name, value):
         if name != "radius":
@@ -92,7 +92,7 @@ class AirCompoundReadingFilterSet(FilterSet):
         return value
 
     @staticmethod
-    def validate_radius(value: float, max_km: float = 500000000) -> float:
+    def validate_radius(value: float, max_km: float = 100) -> float:
         try:
             value = float(value)
         except (TypeError, ValueError):
