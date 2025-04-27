@@ -4,6 +4,10 @@ from django.db import models
 
 
 class Tag(models.Model):
+    """
+    Model for tags that can be associated with locations.
+    """
+
     name = models.CharField(
         max_length=64,
         unique=True,
@@ -14,6 +18,10 @@ class Tag(models.Model):
 
 
 class Location(gis_models.Model):
+    """
+    Model for locations with geographical coordinates.
+    """
+
     name = models.CharField(
         max_length=64,
         unique=True,
@@ -26,6 +34,10 @@ class Location(gis_models.Model):
 
 
 class Compound(models.Model):
+    """
+    Model for chemical compounds.
+    """
+
     symbol = models.CharField(max_length=50, unique=True)
     full_name = models.CharField(max_length=100)
     molecular_weight = models.FloatField(null=True, blank=True)
@@ -36,6 +48,10 @@ class Compound(models.Model):
 
 
 class AirCompoundReading(models.Model):
+    """
+    Model for air compound concentration readings.
+    """
+
     CONCENTRATION_UNITS = (
         ("ug_m3", "Micrograms per cubic meter"),
         ("mg_m3", "Milligrams per cubic meter"),

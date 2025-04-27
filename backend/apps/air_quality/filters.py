@@ -1,13 +1,16 @@
+from apps.air_quality.conversions import get_qs_with_converted_concentration
+from apps.air_quality.models import AirCompoundReading, Compound, Location, Tag
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import D
 from django_filters.rest_framework import FilterSet, filters
 from rest_framework.exceptions import ValidationError
 
-from apps.air_quality.conversions import get_qs_with_converted_concentration
-from apps.air_quality.models import AirCompoundReading, Compound, Location, Tag
-
 
 class LocationFilterSet(FilterSet):
+    """
+    FilterSet for Location objects.
+    """
+
     name = filters.CharFilter(lookup_expr="icontains")
     tag = filters.ModelMultipleChoiceFilter(
         queryset=Tag.objects.all(), to_field_name="name", field_name="tags__name"
@@ -15,6 +18,10 @@ class LocationFilterSet(FilterSet):
 
 
 class AirCompoundReadingFilterSet(FilterSet):
+    """
+    FilterSet for AirCompoundReading objects.
+    """
+
     tag = filters.ModelMultipleChoiceFilter(
         queryset=Tag.objects.all(),
         to_field_name="name",
@@ -38,9 +45,15 @@ class AirCompoundReadingFilterSet(FilterSet):
     radius = filters.NumberFilter(method="filter_by_radius")
 
     def convert_to_target_unit(self, queryset, name, value):
+        """
+        Converts concentration values to the target unit.
+        """
         return get_qs_with_converted_concentration(queryset=queryset, target_unit=value)
 
     def filter_by_radius(self, queryset, name, value):
+        """
+        Filters readings within a specified radius from a given point.
+        """
         if name != "radius":
             return queryset
 
@@ -57,6 +70,9 @@ class AirCompoundReadingFilterSet(FilterSet):
         return queryset.filter(location__coordinates__dwithin=(center, D(km=radius)))
 
     def validate_radius_filters(self, longitude: float, latitude: float, radius: float):
+        """
+        Validates longitude, latitude, and radius values.
+        """
         errors = []
 
         try:
@@ -81,18 +97,27 @@ class AirCompoundReadingFilterSet(FilterSet):
 
     @staticmethod
     def validate_latitude(value: float) -> float:
+        """
+        Validates latitude value.
+        """
         if not -90 <= value <= 90:
             raise ValidationError("Latitude must be between -90 and 90.")
         return value
 
     @staticmethod
     def validate_longitude(value: float) -> float:
+        """
+        Validates longitude value.
+        """
         if not -180 <= value <= 180:
             raise ValidationError("Longitude must be between -180 and 180.")
         return value
 
     @staticmethod
     def validate_radius(value: float, max_km: float = 100) -> float:
+        """
+        Validates radius value.
+        """
         try:
             value = float(value)
         except (TypeError, ValueError):

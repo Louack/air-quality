@@ -4,6 +4,10 @@ from rest_framework import serializers
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
+    """
+    Handles the validation and creation of new user accounts.
+    """
+
     password = serializers.CharField(
         required=True, write_only=True, validators=[validate_password]
     )
@@ -15,6 +19,9 @@ class RegistrationSerializer(serializers.ModelSerializer):
         fields = ("username", "password", "password2")
 
     def save(self, **kwargs):
+        """
+        Creates a new user account with the provided credentials.
+        """
         new_user = User(username=self.validated_data["username"])
         password = self.validated_data["password"]
         password2 = self.validated_data["password2"]

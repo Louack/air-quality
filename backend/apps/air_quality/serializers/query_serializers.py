@@ -1,10 +1,13 @@
+from apps.air_quality.models import AirCompoundReading, Compound
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from apps.air_quality.models import AirCompoundReading, Compound
-
 
 class AirCompoundRadiusQuerySerializer(serializers.Serializer):
+    """
+    Serializer for query parameters for air compound readings within a radius.
+    """
+
     longitude = serializers.FloatField(
         min_value=-180, max_value=180, help_text="Longitude of the center point"
     )
@@ -25,12 +28,15 @@ class AirCompoundRadiusQuerySerializer(serializers.Serializer):
     end_date = serializers.DateTimeField()
 
     def validate(self, attrs):
+        """
+        Validates that start_date is not greater than end_date.
+        """
         error_messages = []
         start_date = attrs.get("start_date")
         end_date = attrs.get("end_date")
 
         if start_date > end_date:
-            error_messages.append("'start_date' cannot be greater thant 'end_date'.")
+            error_messages.append("'start_date' cannot be greater than 'end_date'.")
 
         if error_messages:
             raise ValidationError(error_messages)

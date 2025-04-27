@@ -38,9 +38,15 @@ CONVERSION_RULES = {
     * F("compound__molecular_weight")
     / 24.45,
 }
+"""
+Dictionary mapping concentration unit conversion rules.
+"""
 
 
 def get_qs_with_converted_concentration(queryset, target_unit):
+    """
+    Annotates queryset with concentration values converted to target unit.
+    """
     whens = []
     for (from_unit, to_unit), expression in CONVERSION_RULES.items():
         if target_unit != to_unit:
