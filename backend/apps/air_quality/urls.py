@@ -1,6 +1,3 @@
-from django.urls import path
-from rest_framework.routers import DefaultRouter
-
 from apps.air_quality.views import (
     AirCompoundReadingViewSet,
     AirCompoundStatsWithinRadiusView,
@@ -8,6 +5,8 @@ from apps.air_quality.views import (
     LocationViewSet,
     TagViewSet,
 )
+from django.urls import path
+from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter(trailing_slash=False)
 router.register(prefix="pollutants", viewset=CompoundViewSet, basename="pollutants")
