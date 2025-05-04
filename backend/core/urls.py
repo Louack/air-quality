@@ -16,7 +16,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path("docs", schema_view.with_ui("swagger", cache_timeout=0), name="docs"),
+    path("doc", schema_view.with_ui("swagger", cache_timeout=0), name="docs"),
     path("silk", include("silk.urls")),
     path("admin", admin.site.urls),
     path("auth/", include("apps.users.urls")),

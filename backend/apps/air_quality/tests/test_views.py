@@ -14,9 +14,19 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from apps.users.tests.factories import UserFactory
+from core.tests.factories import APIClientFactory
+
 
 @pytest.fixture
 def api_client():
+    user_to_log = UserFactory()
+    return APIClientFactory(user=user_to_log)
+
+
+@pytest.fixture
+def unauthenticated_client():
+    """Returns an unauthenticated API client for testing unauthorized access."""
     return APIClient()
 
 
@@ -48,6 +58,42 @@ def air_reading(location, compound):
 
 
 @pytest.mark.django_db
+class TestAuthenticationRequired:
+    """Test suite for authentication requirements."""
+
+    @pytest.mark.parametrize("endpoint", [
+        "locations-list",
+        "readings-list",
+        "compounds-list",
+        "tags-list",
+    ])
+    def test_unauthorized_access(self, unauthenticated_client, endpoint):
+        """Test that unauthorized access returns 401 for all protected endpoints."""
+        url = reverse(endpoint)
+        response = unauthenticated_client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert "credentials" in str(response.data).lower()
+
+    def test_unauthorized_create_reading(self, unauthenticated_client, location, compound):
+        """Test that unauthorized users cannot create readings."""
+        url = reverse("readings-list")
+        data = {
+            "compound": compound.full_name,
+            "location": location.name,
+            "entered_concentration_value": 42.0,
+            "entered_concentration_unit": "ug_m3",
+        }
+        response = unauthenticated_client.post(url, data, format="json")
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_unauthorized_location_readings(self, unauthenticated_client, location):
+        """Test that unauthorized users cannot access location readings."""
+        url = reverse("locations-get-readings", args=[location.id])
+        response = unauthenticated_client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.django_db
 class TestLocationViewSet:
     """Test suite for LocationViewSet."""
 
@@ -57,7 +103,6 @@ class TestLocationViewSet:
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data["results"]) >= 1
         assert response.json() == {
             "count": 1,
             "next": None,
@@ -66,7 +111,7 @@ class TestLocationViewSet:
                 "type": "FeatureCollection",
                 "features": [
                     {
-                        "id": 1,
+                        "id": location.pk,
                         "type": "Feature",
                         "geometry": {"type": "Point", "coordinates": [0.0, 0.0]},
                         "properties": {"name": location.name, "tags": [tag.name]},
@@ -83,7 +128,7 @@ class TestLocationViewSet:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["properties"]["name"] == location.name
         assert response.json() == {
-            "id": 2,
+            "id": location.pk,
             "type": "Feature",
             "geometry": {"type": "Point", "coordinates": [0.0, 0.0]},
             "properties": {"name": location.name, "tags": [tag.name]},
@@ -101,14 +146,13 @@ class TestLocationViewSet:
         }
 
         response = api_client.post(url, data, format="json")
+        json = response.json()
 
         assert response.status_code == status.HTTP_201_CREATED
-        assert response.json() == {
-            "id": 3,
-            "type": "Feature",
-            "geometry": {"type": "Point", "coordinates": [0.0, 0.0]},
-            "properties": {"name": "Test Location", "tags": [tag.name]},
-        }
+        assert isinstance(json["id"], int)
+        assert json["type"] == "Feature"
+        assert json["geometry"] == {"type": "Point", "coordinates": [0.0, 0.0]}
+        assert json["properties"] == {"name": "Test Location", "tags": [tag.name]}
 
     def test_get_readings(self, api_client, location, air_reading, compound):
         """Test retrieving readings for a location."""
@@ -216,6 +260,56 @@ class TestAirCompoundReadingViewSet:
             == air_reading.entered_concentration_value * 1000
         )
 
+    def test_list_readings_with_pagination(self, api_client, location, compound):
+        """Test pagination of air compound readings."""
+        # Create 15 readings
+        readings = [
+            AirCompoundReadingFactory(
+                location=location,
+                compound=compound,
+            )
+            for i in range(15)
+        ]
+
+        url = reverse("readings-list")
+        # Test first page
+        response = api_client.get(url + "?page=1&page_size=10")
+        
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["count"] == 15
+        assert len(response.data["results"]) == 10
+        assert response.data["next"] is not None
+        assert response.data["previous"] is None
+
+        # Test second page
+        response = api_client.get(url + "?page=2&page_size=10")
+        
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data["results"]) == 5
+        assert response.data["next"] is None
+        assert response.data["previous"] is not None
+
+    @pytest.mark.parametrize("concentration_unit,concentration_value,expected_status", [
+        ("invalid_unit", 42.0, status.HTTP_400_BAD_REQUEST),
+        ("ppm", "not_a_number", status.HTTP_400_BAD_REQUEST),
+        ("ug_m3", 0.0, status.HTTP_201_CREATED),
+        ("ppb", - 10, status.HTTP_400_BAD_REQUEST),
+    ])
+    def test_create_reading_edge_cases(
+        self, api_client, location, compound,
+        concentration_unit, concentration_value, expected_status
+    ):
+        """Test creating readings with various edge cases."""
+        url = reverse("readings-list")
+        data = {
+            "compound": compound.full_name,
+            "location": location.name,
+            "entered_concentration_value": concentration_value,
+            "entered_concentration_unit": concentration_unit
+        }
+        response = api_client.post(url, data, format="json")
+        assert response.status_code == expected_status
+
 
 @pytest.mark.django_db
 class TestTagViewSet:
@@ -231,7 +325,7 @@ class TestTagViewSet:
             "count": 1,
             "next": None,
             "previous": None,
-            "results": [{"name": "Tag 8"}],
+            "results": [{"name": tag.name}],
         }
 
     def test_create_tag(self, api_client):
@@ -251,7 +345,7 @@ class TestCompoundViewSet:
 
     def test_list_compounds(self, api_client, compound):
         """Test retrieving a list of compounds."""
-        url = reverse("pollutants-list")
+        url = reverse("compounds-list")
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -266,7 +360,7 @@ class TestCompoundViewSet:
 
     def test_create_compound(self, api_client):
         """Test creating a new compound."""
-        url = reverse("pollutants-list")
+        url = reverse("compounds-list")
         data = {"symbol": "CO2", "full_name": "Carbon Dioxide", "is_gaseous": True}
 
         response = api_client.post(url, data, format="json")

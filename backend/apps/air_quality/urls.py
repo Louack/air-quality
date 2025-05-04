@@ -9,7 +9,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter(trailing_slash=False)
-router.register(prefix="pollutants", viewset=CompoundViewSet, basename="pollutants")
+router.register(prefix="compounds", viewset=CompoundViewSet, basename="compounds")
 router.register(prefix="tags", viewset=TagViewSet, basename="tags")
 router.register(prefix="locations", viewset=LocationViewSet, basename="locations")
 router.register(
